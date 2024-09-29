@@ -4,7 +4,6 @@ import { Database, newDatabaseInstance } from "./database/database";
 import { AppRouter } from "./router";
 import { AppRoutersDefinition } from "./utils/routers";
 
-loadEnvVariables();
 
 export class Server {
     public readonly port = process.env.APP_PORT || 3001;

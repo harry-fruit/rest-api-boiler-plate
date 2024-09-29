@@ -31,8 +31,13 @@ const getEnvFileName = () => {
 
 
 export const getDBsConfigs = async(fileName: string): Promise<DBConfig[]> => {
-  const configsPath = resolve(__dirname, "databases");
-  const configJSON = await readFile(resolve(configsPath, `${fileName}.json`), "utf8");
+  const configsPath = resolve(__dirname, "databases", `${fileName}.json`);
+
+  if (!existsSync(configsPath)) {
+    throw new Error(`Databases config file not found: ${fileName}.json`);
+  }
+
+  const configJSON = await readFile(configsPath, "utf8");
   const dbsConfigs = JSON.parse(configJSON);
   
   if (!dbsConfigs) {
