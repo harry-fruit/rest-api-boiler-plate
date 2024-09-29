@@ -1,0 +1,11 @@
+export enum ErrorType {
+    TYPEORM = "TYPE_ORM",
+    NOT_FOUND = "NOT_FOUND",
+    UNHANDLED = "UNHANDLED"
+}
+
+export enum ErrorDefinition {
+    UNHANDLED = "UNHANDLED",
+    NOT_FOUND = "NOT_FOUND",
+    UNIQUE_CONSTRAINT_VIOLATION = "UNIQUE_CONSTRAINT_VIOLATION",
+}
