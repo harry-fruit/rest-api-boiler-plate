@@ -1,6 +1,7 @@
 import { Express, json, urlencoded } from "express";
 import { Database } from "./database/database";
 import { AppRoutersDefinition } from "./utils/routers";
+import logger from "./utils/logger";
 
 
 export class AppRouter {
@@ -21,7 +22,7 @@ export class AppRouter {
             const routerInstance = new router(this.dbs);
             this.app.use(path, routerInstance.getRoute());
             
-            console.log(`[${name}] Router set`); //TODO: Logar somente em DEBUG
+            logger.debug(`[${name}] Router set`);
         }
 
         // TODO: Add error handler

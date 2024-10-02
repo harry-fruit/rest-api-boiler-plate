@@ -1,8 +1,9 @@
 import express, { Express } from "express";
-import { getDBsConfigs, loadEnvVariables } from "./configs/configurations";
+import { getDBsConfigs } from "./configs/configurations";
 import { Database, newDatabaseInstance } from "./database/database";
 import { AppRouter } from "./router";
 import { AppRoutersDefinition } from "./utils/routers";
+import logger from "./utils/logger";
 
 
 export class Server {
@@ -20,7 +21,7 @@ export class Server {
         this.setAppRouters();
 
         this.app.listen(this.port, () => {
-            console.log(`Server is running on port ${this.port}`);
+            logger.info(`Server is running on port ${this.port}`);
         });
     }
 
@@ -36,7 +37,7 @@ export class Server {
         
         for (let dbConfig of dbsConfig) {
             databases.push(await newDatabaseInstance(dbConfig));
-            console.log(`[${dbConfig.dbType} - ${dbConfig.schema} - ${dbConfig.orm}] Database ${dbConfig.dbName} initialized`); //TODO: Logar somente em DEBUG
+            logger.debug(`[${dbConfig.dbType} - ${dbConfig.schema} - ${dbConfig.orm}] Database ${dbConfig.dbName} initialized`);
         }
 
         return databases;
@@ -49,7 +50,7 @@ export class Server {
 
         const appRouter = new AppRouter(this.app, this.dbs);
         appRouter.setRoutes(this.routers);
-        console.log("App routers set"); //TODO: Logar somente em DEBUG
+        logger.debug("App routers set");
     }
 
 }

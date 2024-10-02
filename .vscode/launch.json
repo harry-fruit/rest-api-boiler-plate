@@ -9,7 +9,7 @@
           "<node_internals>/**",
           "**/node_modules/**"
         ],
-        "runtimeExecutable": "npm",
+        "runtimeExecutable": "pnpm",
         "runtimeArgs": [
           "exec",
           "ts-node-dev",

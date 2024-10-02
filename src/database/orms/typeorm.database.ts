@@ -83,6 +83,7 @@ export class TypeORMDatabase implements IORMDatabase {
 
     protected getConfig(): DataSourceOptions {
         const { dialect, host, port, dbName, username, password, synchronize, logging, schema } = this.config;
+        const isDebug = process.env.DEBUG?.toLowerCase() === "true";
 
         return {
             type: dialect as TypeORMDialects.POSTGRES | TypeORMDialects.MSSQL,
@@ -93,7 +94,7 @@ export class TypeORMDatabase implements IORMDatabase {
             database: dbName,
             synchronize,
             schema,
-            logging: logging, //TODO - Setar em modo DEBUG
+            logging: logging ?? isDebug,
             entities: [SysClasses, SysTypes, SysCategory, SysStatus]
         }
     }

@@ -3,13 +3,14 @@ import { readFile } from "fs/promises";
 import { resolve } from "path";
 import { DBConfig } from "../types/database";
 import { existsSync } from "fs";
+import logger from "../utils/logger";
 
 export const loadEnvVariables = () => {
   const envFileName = getEnvFileName();
   const path = resolve(__dirname, "..", "..", envFileName);
 
   dotenv.config({ path });
-  console.log(`Loading .env '${envFileName}'`); //TODO: Logar somente em DEBUG
+  logger.debug(`Loading .env '${envFileName}'`);
 };
 
 const getEnvFileName = () => {

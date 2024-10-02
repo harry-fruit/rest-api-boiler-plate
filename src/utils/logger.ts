@@ -1,55 +1,20 @@
-import path from 'path';
-import { createLogger, format, transports, Logger as WinstonLogger } from 'winston';
-import { FileTransportInstance } from 'winston/lib/winston/transports';
+import winston, { createLogger, format, transports, Logger as WinstonLogger } from 'winston';
 
-type CreateTransportFileParams = {
-    maxsize?: number;
-    maxFiles?: number;
-    filename: string;
-    level: string;
-}
 
 class Logger {
   private logger: WinstonLogger;
 
   constructor() {
-    const logFormat = format.combine(
-      format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-      format.printf(({ timestamp, level, message }) => `${timestamp} [${level.toUpperCase()}]: ${message}`)
-    );
-
     this.logger = createLogger({
-      level: 'info',
-      format: logFormat,
+      level: process.env.NODE_ENV?.toLowerCase() === "dev" ? "debug" : "info",
+      format: this.getLogFormat(),
       transports: [
-        new transports.Console({
-          format: format.combine(
-            format.colorize(),
-            logFormat
-          )
-        }),
-        this.createTransportsFile({
-            filename: path.join(__dirname, '../../logs/error.log'),
-            level: 'error',
-        }),
-        this.createTransportsFile({
-            filename: path.join(__dirname, '../../logs/info.log'),
-            level: 'info',
-        })
-      ],
-      exitOnError: false,
+        new winston.transports.File({ filename: 'error.log', level: 'error' }),
+        new winston.transports.File({ filename: 'app.log' }),
+        new transports.Console({ format: this.getLogFormat() })
+      ]
     });
 
-  }
-
-  private createTransportsFile({ maxsize = 5242880, maxFiles = 5, filename, level }: CreateTransportFileParams): FileTransportInstance {
-    return new transports.File({
-        filename,
-        level,
-        handleExceptions: true,
-        maxsize,
-        maxFiles
-    })
   }
 
   public info(message: string): void {
@@ -72,6 +37,14 @@ class Logger {
 
   public logObject(level: 'info' | 'warn' | 'error' | 'debug', message: string, obj: any): void {
     this.logger.log(level, `${message} - ${JSON.stringify(obj)}`);
+  }
+
+  private getLogFormat(): winston.Logform.Format {
+    const logFormat = format.combine(
+      format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+      format.printf(({ timestamp, level, message }) => `[${level.toUpperCase()}] [${timestamp}]: ${message}`),
+    );
+    return logFormat;
   }
 }
 
