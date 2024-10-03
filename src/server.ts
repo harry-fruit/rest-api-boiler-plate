@@ -7,13 +7,15 @@ import logger from "./utils/logger";
 
 
 export class Server {
-    public readonly port = process.env.APP_PORT || 3001;
+    public readonly port: number;
     public routers: AppRoutersDefinition[];
-    private app: Express = express();
+    private app: Express;
     private dbs?: Database[];
 
-    constructor(routers: AppRoutersDefinition[]) {
+    constructor(app: Express, routers: AppRoutersDefinition[]) {
+        this.app = app;
         this.routers = routers;
+        this.port = this.getPort();
     }
     
     public async run() {
@@ -44,13 +46,23 @@ export class Server {
     }
 
     private setAppRouters() {
-        if (!this.dbs) {
+        if (!this.dbs || this.dbs.length === 0) {
             throw new Error("Databases not initialized");
         }
 
         const appRouter = new AppRouter(this.app, this.dbs);
         appRouter.setRoutes(this.routers);
         logger.debug("App routers set");
+    }
+
+    private getPort(): number {
+        const port = process.env.APP_PORT;
+        
+        if (!port) {
+            throw new Error("APP_PORT not found in .env file");
+        }
+
+        return parseInt(port);
     }
 
 }
