@@ -2,11 +2,12 @@ import express from "express";
 import logger from "../utils/logger";
 import { setupMocks } from "../__mocks__/mockHelper";
 import { Server } from "../server";
-import { newDatabaseInstance } from "../database/__mocks__/database";
 import { SysClassesRoutes } from "../modules/sys/classes/sys-class.routes";
 import { getDBsConfigs } from "../configs/configurations";
+import { newDatabaseInstance } from "../database/database";
 
 
+jest.mock("../database/database");
 jest.mock("../configs/configurations");
 jest.mock("../utils/logger");
 jest.mock("../modules/sys/classes/sys-class.routes");
