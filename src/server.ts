@@ -1,9 +1,9 @@
-import express, { Express } from "express";
+import { Express } from "express";
 import { getDBsConfigs } from "./configs/configurations";
 import { Database, newDatabaseInstance } from "./database/database";
-import { AppRouter } from "./router";
 import { AppRoutersDefinition } from "./utils/routers";
 import logger from "./utils/logger";
+import { setMiddlewares, setRouters } from "./router";
 
 
 export class Server {
@@ -50,8 +50,14 @@ export class Server {
             throw new Error("Databases not initialized");
         }
 
-        const appRouter = new AppRouter(this.app, this.dbs);
-        appRouter.setRoutes(this.routers);
+        setRouters({
+            app: this.app, 
+            dbs: this.dbs, 
+            routersDefinition: this.routers
+        })
+
+        setMiddlewares(this.app);
+
         logger.debug("App routers set");
     }
 

@@ -35,14 +35,14 @@ export const getDBsConfigs = async(fileName: string): Promise<DBConfig[]> => {
   const configsPath = resolve(__dirname, "databases", `${fileName}.json`);
 
   if (!existsSync(configsPath)) {
-    throw new Error(`Databases config file not found: ${fileName}.json`);
+    throw new Error(`Databases config file not found: ${fileName}`);
   }
 
   const configJSON = await readFile(configsPath, "utf8");
   const dbsConfigs = JSON.parse(configJSON);
   
   if (!dbsConfigs) {
-    throw new Error(`Databases config file not found: ${fileName}.json`);
+    throw new Error(`Databases config file not found: ${fileName}`);
   }
 
   return dbsConfigs;

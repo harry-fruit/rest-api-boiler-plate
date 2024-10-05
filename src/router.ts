@@ -4,36 +4,25 @@ import { AppRoutersDefinition } from "./utils/routers";
 import logger from "./utils/logger";
 
 
-export class AppRouter {
-    private app: Express;
-    private dbs: Database[];
-    
-    constructor(app: Express, dbs: Database[]) {
-        this.app = app;
-        this.dbs = dbs;
-    }
+type SetRoutesParams = {
+    app: Express
+    dbs: Database[]
+    routersDefinition: AppRoutersDefinition[]
+}
 
-    public setRoutes(routersDefinition: AppRoutersDefinition[]): void {
-        this.setMiddlewares();
+export const setMiddlewares = (app: Express): void =>{
+    app.use(json());
+    app.use(urlencoded({ extended: true }));
+}
+
+
+export const setRouters = ({ app, dbs, routersDefinition }: SetRoutesParams) => {
+    for (let routerDefinition of routersDefinition) {
+        const { name, path, router } = routerDefinition;
+
+        const routerInstance = new router(dbs);
+        app.use(path, routerInstance.getRoute());
         
-        for (let routerDefinition of routersDefinition) {
-            const { name, path, router } = routerDefinition;
-
-            const routerInstance = new router(this.dbs);
-            this.app.use(path, routerInstance.getRoute());
-            
-            logger.debug(`[${name}] Router set`);
-        }
-
-        // TODO: Add error handler
-        // Middleware - Error handler
-        // app.use(errorHandler);
-
+        logger.debug(`[${name}] Router set`);
     }
-
-    private setMiddlewares(): void {
-        this.app.use(json());
-        this.app.use(urlencoded({ extended: true }));
-    }
-
 }
