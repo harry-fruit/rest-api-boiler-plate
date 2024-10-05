@@ -13,7 +13,7 @@ export const loadEnvVariables = () => {
   logger.debug(`Loading .env '${envFileName}'`);
 };
 
-const getEnvFileName = () => {
+export const getEnvFileName = () => {
   const { NODE_ENV } = process.env;
 
   if (!NODE_ENV) {
@@ -29,7 +29,6 @@ const getEnvFileName = () => {
 
   return envFileName;
 };
-
 
 export const getDBsConfigs = async(fileName: string): Promise<DBConfig[]> => {
   const configsPath = resolve(__dirname, "databases", `${fileName}.json`);

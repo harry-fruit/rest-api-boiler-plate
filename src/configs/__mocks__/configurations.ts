@@ -1,4 +1,4 @@
-export const getDBsConfigs = jest.fn().mockResolvedValue([
+export const getDBsConfigs = jest.fn().mockReturnValue([
   {
     unique: "PG_DATABASE",
     dialect: "postgres",
@@ -15,4 +15,5 @@ export const getDBsConfigs = jest.fn().mockResolvedValue([
   },
 ]);
 
-export const loadEnvVariables = jest.fn().mockName("mock_loadEnvVariables");
+export const loadEnvVariables = jest.fn();
+export const getEnvFileName = jest.fn();
