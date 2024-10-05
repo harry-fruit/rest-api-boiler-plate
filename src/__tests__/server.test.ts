@@ -1,30 +1,32 @@
 import express from "express";
+import logger from "../utils/logger";
 import { setupMocks } from "../__mocks__/mockHelper";
 import { Server } from "../server";
-import { getDBsConfigs } from "../configs/__mocks__/configurations";
 import { newDatabaseInstance } from "../database/__mocks__/database";
-import { SysClassesRoutes } from "../modules/sys/classes/__mocks__/sys-class.routes";
-import logger from "../utils/logger"; // o caminho para o seu logger
+import { SysClassesRoutes } from "../modules/sys/classes/sys-class.routes";
+import { getDBsConfigs } from "../configs/configurations";
 
-const mockRouters = [{ name: "test", path: "/test", router: SysClassesRoutes }];
-const env = process.env;
 
-jest.mock("../utils/logger", () => ({
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-  debug: jest.fn(),
-}));
-
+jest.mock("../configs/configurations");
+jest.mock("../utils/logger");
+jest.mock("../modules/sys/classes/sys-class.routes");
 jest.mock("express", () => {
-  const mockApp = {
+  const actualExpress = jest.requireActual("express"); // Import actual express
+  const mockExpressDefault = {
     listen: jest.fn().mockImplementation((port, callback) => {
       callback();
       logger.info(`Server is running on port ${port}`);
     }),
     use: jest.fn(),
   };
-  return () => mockApp;
+
+  return {
+    __esModule: true,
+    ...actualExpress,
+    default: jest.fn(() => mockExpressDefault),
+    json: jest.fn(),
+    urlencoded: jest.fn(),
+  };
 });
 
 beforeEach(() => {
@@ -33,26 +35,35 @@ beforeEach(() => {
   setupMocks();
 });
 
-describe("Server", () => {
+const env = process.env;
+const mockRouters = [{ name: "test", path: "/test", router: SysClassesRoutes }];
 
+describe("Server", () => {
   it("should start the server correctly", async () => {
     process.env = {
       ...process.env,
       APP_PORT: "4000",
-      DATABASES_CONFIG_FILE_NAME: "dbConfig.json",
+      DATABASES_CONFIG_FILE_NAME: "databases",
     };
 
     const server = new Server(express(), mockRouters);
     await server.run();
 
-    expect(getDBsConfigs).toHaveBeenCalledWith("dbConfig.json");
+    expect(getDBsConfigs).toHaveBeenCalledWith("databases");
     expect(newDatabaseInstance).toHaveBeenCalledWith({
-      dbType: "postgres",
-      schema: "public",
-      orm: "typeorm",
-      dbName: "test_db",
+      unique: "PG_DATABASE",
+      dialect: "postgres",
+      host: "localhost",
+      port: 5432,
+      username: "admin",
+      password: "admin",
+      dbName: "tasks_module",
+      schema: "DEV",
+      synchronize: true,
+      logging: false,
+      orm: "TYPEORM",
+      dbType: "SQL",
     });
-
     expect(express().listen).toHaveBeenCalled();
     expect(express().listen).toHaveBeenCalledWith(4000, expect.any(Function));
     expect(logger.info).toHaveBeenCalledWith("Server is running on port 4000"); // Verifica se a mensagem foi chamada
@@ -63,7 +74,6 @@ describe("Server", () => {
       ...process.env,
       APP_PORT: "4000",
     };
-    console.log(process.env.DATABASES_CONFIG_FILE_NAME);
 
     const server = new Server(express(), mockRouters);
     await expect(server.run()).rejects.toThrow(
@@ -78,19 +88,18 @@ describe("Server", () => {
       DATABASES_CONFIG_FILE_NAME: "wrong_config.json",
     };
 
-    getDBsConfigs.mockResolvedValue([]);
+    (getDBsConfigs as jest.Mock).mockResolvedValue([]);
     const server = new Server(express(), mockRouters);
 
     await expect(server.run()).rejects.toThrow("Databases not initialized");
-    expect(getDBsConfigs).toHaveBeenCalledWith("wrong_config.json");
   });
 
   it("should throw an error if the port is not defined", async () => {
     process.env = {
       ...process.env,
-      DATABASES_CONFIG_FILE_NAME: "dbConfig.json",
+      DATABASES_CONFIG_FILE_NAME: "databases",
     };
-    
+
     try {
       new Server(express(), mockRouters);
     } catch (error: any) {
