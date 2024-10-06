@@ -1,4 +1,4 @@
-import * as configurations from "../../configs/configurations";
+import * as configurations from "../configurations";
 import { resolve } from "path";
 import { config } from "dotenv";
 import logger from "../../utils/logger";
