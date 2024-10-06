@@ -14,10 +14,10 @@ enum TypeORMDialects {
     MSSQL = "mssql" 
 }
 
-
 export class TypeORMDatabase implements IORMDatabase {
     public dataSource: DBDataSource;
     public config: DBConfig;
+    public isInitialized: boolean = false;
 
     constructor(config: DBConfig) {
         this.config = config;
@@ -32,6 +32,7 @@ export class TypeORMDatabase implements IORMDatabase {
                 await this.dataSource.synchronize();
             }
 
+            this.isInitialized = true;
         } catch (error) {
             console.log(error);
         }

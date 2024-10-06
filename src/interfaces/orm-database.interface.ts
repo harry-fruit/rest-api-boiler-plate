@@ -6,6 +6,7 @@ import { PaginatedQueryResult } from "../types/paginated-query";
 export interface IORMDatabase {
     dataSource: DBDataSource;
     config: DBConfig;
+    isInitialized: boolean;
 
     initialize(): void;
     getById<Entity>(id: number, model: ORMModel): Promise<Entity | null>;

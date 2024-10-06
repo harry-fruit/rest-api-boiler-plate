@@ -7,7 +7,7 @@ import { TypeORMDatabase } from "./orms/typeorm.database";
 
 
 export class Database {
-    private database: ORMDatabase;
+    public database: ORMDatabase;
     private config: DBConfig;
     
     constructor(config: DBConfig){
@@ -45,15 +45,10 @@ export class Database {
     }
 
     private getRelationalDB(): ORMDatabase {
-        try {
-            switch (this.config.orm) {
-                default:
-                    return new TypeORMDatabase(this.config);
-            }
-        } catch (error) {
-            throw new Error("Something went wrong on database instance");
+        switch (this.config.orm) {
+            default:
+                return new TypeORMDatabase(this.config);
         }
-
     }
     
     public async getById <Entity>(id: number, model: ORMModel): Promise<Entity | null> {
