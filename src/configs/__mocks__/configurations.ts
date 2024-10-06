@@ -1,3 +1,5 @@
+import { DBType } from "../../enums/database.enum";
+
 export const getDBsConfigs = jest.fn().mockReturnValue([
   {
     unique: "PG_DATABASE",
@@ -11,7 +13,7 @@ export const getDBsConfigs = jest.fn().mockReturnValue([
     synchronize: true,
     logging: false,
     orm: "TYPEORM",
-    dbType: "SQL",
+    dbType: DBType.SQL,
   },
 ]);
 
