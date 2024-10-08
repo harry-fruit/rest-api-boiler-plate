@@ -1,7 +1,7 @@
 import { DBType } from "../../enums/database.enum";
 import { SysClasses } from "../../modules/sys/classes/sys-class.entity";
 import { DBConfig } from "../../types/database";
-import { Database } from "../database";
+import { Database, newDatabaseInstance } from "../database";
 import { FakeEntityData } from "../orms/__mocks__/typeorm.database";
 import { TypeORMDatabase } from "../orms/typeorm.database";
 
@@ -96,8 +96,44 @@ describe("Database", () => {
       
     });
 
-  });
+    it("should save an entity", async () => {
+      const entity: Partial<SysClasses> = {
+        uniqueCode: "TEST_CODE",
+        description: "TEST_DESCRIPTION",
+      };
+      const databaseInstance = new Database(dbConfig);
+      const savedEntity = await databaseInstance.save(entity, SysClasses);
 
+      expect(savedEntity).toBeDefined();
+      expect(savedEntity.id).toBeDefined();
+      expect(savedEntity.id).toBeGreaterThan(0);
+      expect(savedEntity.uniqueCode).toBe(entity.uniqueCode);
+      expect(savedEntity.description).toBe(entity.description);
+    });
+
+    it("should delete an entity", async () => {
+      const id = 1;
+
+      const databaseInstance = new Database(dbConfig);
+      await expect(databaseInstance.delete(id, SysClasses)).resolves.toBeUndefined();
+    });
+
+    it("should soft delete an entity", async () => {
+      const id = 1;
+
+      const databaseInstance = new Database(dbConfig);
+      await expect(databaseInstance.softDelete(id, SysClasses)).resolves.toBeUndefined();
+    });
+
+    it("should create a new database instance initialized", async () => {
+      const databaseInstance = await newDatabaseInstance(dbConfig);
+
+      expect(databaseInstance).toBeDefined();
+      expect(databaseInstance.database).toBeDefined();
+      expect(databaseInstance.database.isInitialized).toBeTruthy();
+    });
+
+  });
 
   it("should throw an error if Database type is not supported", async () => {
     try {
@@ -111,4 +147,5 @@ describe("Database", () => {
       expect(error.message).toBe("Database type not supported");
     }
   });
+
 });

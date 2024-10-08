@@ -20,7 +20,6 @@ export class Database {
     }
 
     public async initialize(): Promise<void> {
-        if (!this.database) throw new Error("Database not instantiated");
         await this.database.initialize();
     }
 

@@ -28,9 +28,16 @@ export const TypeORMDatabase = jest.fn().mockImplementation(() => {
         count: 10,
         data: getAllFakeData
     })),
-    save: jest.fn(),
-    delete: jest.fn(),
-    softDelete: jest.fn(),
+    save: jest.fn(({ uniqueCode, description }: Partial<FakeEntityData>) => {
+      const id = Math.floor(Math.random() * 20) + 1;
+      return Promise.resolve({
+        id,
+        uniqueCode,
+        description
+      });
+    }),
+    delete: jest.fn().mockResolvedValue(undefined),
+    softDelete: jest.fn().mockResolvedValue(undefined),
   };
 });
 
